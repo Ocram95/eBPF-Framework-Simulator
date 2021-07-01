@@ -37,23 +37,32 @@ def process_command_line(argv):
 	settings, args = parser.parse_args(argv)
 		
 	if settings.bins not in POSSIBLE_BINS[settings.field]:
-		raise ValueError("error")	
+		raise ValueError("Number of bins wrong for this specific field.")	
+	if settings.field not in POSSIBLE_BINS:
+		raise ValueError("Unsupported field.")
+	if settings.sampling_interval <= 0:
+		raise ValueError("Invalid sampling interval.")
+
 	return settings, args
 
 def parse_pcap(bins_structure, pcap, field, sampling_interval, T_window, W_window, output_file):
+	#Saving original samping interval and T window
+	original_sampling_interval = sampling_interval
+	original_T_window = T_window
+
 	first_packet_time = 0
-	count_pkt = 0
+
+	print("Reading pcap...")
 	pkts = rdpcap(pcap)
-	elapsed_time = 0
-	current_time = 0
-	window_time = 0
+	print("Read finished")
+
 	number_of_samples = 0
 	first_row = True
 	for x in range(len(pkts)):
 		initial_time = time.perf_counter()
 		if first_packet_time == 0:
 			first_packet_time = pkts[x].time
-		instant_time = pkts[x].time - first_packet_time
+		packet_time = pkts[x].time - first_packet_time
 
 		if field == "FL":
 			value = pkts[x][IPv6].fl
@@ -64,7 +73,7 @@ def parse_pcap(bins_structure, pcap, field, sampling_interval, T_window, W_windo
 
 		#Write first line of zeros	
 		if first_row:
-			write_csv(output_file, bins_structure, current_time)
+			write_csv(output_file, bins_structure, 0)
 			first_row = False
 
 		for key in bins_structure.keys():
@@ -72,34 +81,31 @@ def parse_pcap(bins_structure, pcap, field, sampling_interval, T_window, W_windo
 				bins_structure[key] += 1
 				number_of_samples += 1
 
-		#TODO: Remove. It is necessary for short pcap files
-		time.sleep(0.5)
-
-		final_time = time.perf_counter()
-		elapsed_time += final_time - initial_time
-		window_time += elapsed_time
-
-		if elapsed_time >= sampling_interval:
-			#print(str(elapsed_time) + " scrivo riga csv")
-			current_time += elapsed_time
-			write_csv(output_file, bins_structure, current_time)
-			elapsed_time = 0
+		if packet_time >= sampling_interval:
+			#Adding the original sampling interval to consider the following "period"
+			sampling_interval += original_sampling_interval
+			write_csv(output_file, bins_structure, packet_time)
 
 		if T_window != -1:
-			if window_time >= T_window:
-				print("resetto mappa")
+			if packet_time >= T_window:
+				print("Resetting map for T windows")
 				for key in bins_structure.keys():
 					bins_structure[key] = 0
-				window_time = 0
-				first_row = True
+				T_window += original_T_window
+				#Necessary to obtain a line of zeros after the reset. May be removed
+				#first_row = True
 		if W_window != -1:
 			if number_of_samples >= W_window:
-				print("resetto mappa")
+				print("Resetting map for W window")
 				for key in bins_structure.keys():
 					bins_structure[key] = 0
 				number_of_samples = 0
-				first_row = True
-
+				#Necessary to obtain a line of zeros after the reset. May be removed
+				#first_row = True			
+	#TODO:
+	#Some final packets may be not parsed. Consider to write the final map
+	# if number_of_samples == len(pkts):
+	#	write_csv(output_file, bins_structure, packet_time)
 	return bins_structure
 
 
@@ -112,7 +118,6 @@ def create_bins_structure(number_of_bins, dim_field):
 		dictionary[range(prev, succ)] = 0
 		prev = succ
 		succ += bin_size
-	#print(dictionary)
 	return dictionary
 
 def write_csv(csv_file_name, bins_structure, current_time):
@@ -127,7 +132,6 @@ def write_csv(csv_file_name, bins_structure, current_time):
 
 settings, args = process_command_line(sys.argv)
 bins_structure = create_bins_structure(settings.bins, pow(2, FIELD_LENGTH[settings.field]))
-#print(bins_structure)
 parse_pcap(bins_structure, settings.pcap, settings.field, settings.sampling_interval, settings.T_window, settings.W_window, settings.output_file)
 
 
