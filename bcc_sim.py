@@ -42,6 +42,12 @@ def process_command_line(argv):
 		raise ValueError("Unsupported field.")
 	if settings.sampling_interval <= 0:
 		raise ValueError("Invalid sampling interval.")
+	if settings.T_window and settings.W_window:
+		raise ValueError("Cannot specify both T window and W window.")
+	if settings.T_window < -1 or settings.W_window < -1:
+		raise ValueError("Invalid window.")
+
+
 
 	return settings, args
 
@@ -91,6 +97,7 @@ def parse_pcap(bins_structure, pcap, field, sampling_interval, T_window, W_windo
 				print("Resetting map for T windows")
 				for key in bins_structure.keys():
 					bins_structure[key] = 0
+				#Adding the original T window to consider the following "period"
 				T_window += original_T_window
 				#Necessary to obtain a line of zeros after the reset. May be removed
 				#first_row = True
@@ -125,7 +132,7 @@ def write_csv(csv_file_name, bins_structure, current_time):
 		writer = csv.writer(file)
 		bins_values = list(bins_structure.values())
 		bins_values.insert(0, current_time)
-		print(bins_values)
+		#print(bins_values)
 		writer.writerow(bins_values)
 
 
