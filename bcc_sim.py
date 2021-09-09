@@ -28,7 +28,7 @@ def process_command_line(argv):
 
 	parser.add_option('-i', '--sampling_interval', help='Specify the sampling interval.', default=1, action='store', type='int', dest='sampling_interval')
 
-	parser.add_option('-t', '--T_window', help='Specify the time window.', default=-1, action='store', type='int', dest='T_window')
+	parser.add_option('-t', '--T_window', help='Specify the time window.', default=-1, action='store', type='float', dest='T_window')
 
 	parser.add_option('-w', '--W_window', help='Specify the sampling window.', default=-1, action='store', type='int', dest='W_window')
 
@@ -42,12 +42,10 @@ def process_command_line(argv):
 		raise ValueError("Unsupported field.")
 	if settings.sampling_interval <= 0:
 		raise ValueError("Invalid sampling interval.")
-	if settings.T_window and settings.W_window:
+	if settings.T_window != -1 and settings.W_window != -1:
 		raise ValueError("Cannot specify both T window and W window.")
 	if settings.T_window < -1 or settings.W_window < -1:
 		raise ValueError("Invalid window.")
-
-
 
 	return settings, args
 
@@ -94,7 +92,7 @@ def parse_pcap(bins_structure, pcap, field, sampling_interval, T_window, W_windo
 
 		if T_window != -1:
 			if packet_time >= T_window:
-				print("Resetting map for T windows")
+				#print("Resetting map for T windows")
 				for key in bins_structure.keys():
 					bins_structure[key] = 0
 				#Adding the original T window to consider the following "period"
@@ -103,7 +101,7 @@ def parse_pcap(bins_structure, pcap, field, sampling_interval, T_window, W_windo
 				#first_row = True
 		if W_window != -1:
 			if number_of_samples >= W_window:
-				print("Resetting map for W window")
+				#print("Resetting map for W window")
 				for key in bins_structure.keys():
 					bins_structure[key] = 0
 				number_of_samples = 0
