@@ -136,7 +136,7 @@ def write_csv(csv_file_name, bins_structure, current_time):
 
 
 settings, args = process_command_line(sys.argv)
-bins_structure = create_bins_structure(settings.bins, pow(2, FIELD_LENGTH[settings.field]))
+bins_structure = create_bins_structure(pow(2, settings.bins), pow(2, FIELD_LENGTH[settings.field]))
 parse_pcap(bins_structure, settings.pcap, settings.field, settings.sampling_interval, settings.T_window, settings.W_window, settings.output_file)
 
 
