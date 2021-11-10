@@ -23,9 +23,11 @@ def process_command_line(argv):
 	return settings, args
 
 
-def tmp_plot(number_of_bins_different_from_zero):
+def tmp_plot(number_of_bins_different_from_zero, ):
 	fig, ax = plt.subplots()
+	
 	ax.plot(number_of_bins_different_from_zero["timestamp"], number_of_bins_different_from_zero["!=0"], label='your label')
+
 	ax.set_ylabel('no. of bins != 0')
 	ax.set_xlabel('time [s]')
 	ax.legend()
@@ -39,8 +41,9 @@ read_data = pd.read_csv(settings.csv, header=None)
 time_col = read_data.pop(read_data.columns[0])
 number_of_bins_different_from_zero = read_data.astype(bool).sum(axis=1).to_frame(name="!=0")
 number_of_bins_different_from_zero.insert(loc=0, column='timestamp', value=time_col)
-print(number_of_bins_different_from_zero)
+
 tmp_plot(number_of_bins_different_from_zero)
+
 
 
 

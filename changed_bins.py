@@ -44,8 +44,6 @@ def tmp_plot(data):
 	plt.show()
 
 
-#MAIN
 settings, args = process_command_line(sys.argv)
 processed_data = read_and_process(settings.csv)
-#print(processed_data)
 tmp_plot(processed_data)
