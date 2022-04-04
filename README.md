@@ -1,7 +1,7 @@
 # bccstego Simulator Suite
 
-This suite contains several Python scripts that allows to simulate the program [bccstego](https://github.com/Ocram95/eBPF-Framework) and calculate different metrics that allow to reveal the presence of network covert channels. In particular:
-- ```bcc_sim.py```: allows to simulate [bccstego](https://github.com/Ocram95/eBPF-Framework);
+This suite contains several Python scripts that allows to simulate the program [eBPF Framework](https://github.com/Ocram95/eBPF-Framework) and calculate different metrics that allow to reveal the presence of network covert channels. In particular:
+- ```bcc_sim.py```: allows to simulate [eBPF Framework](https://github.com/Ocram95/eBPF-Framework);
 - ```bins_ne_0.py```: allows to compute the number of non-empty bins;
 - ```changed_bins.py```: allows to compute the number of bins changed between subsequent sampling interval;
 - ```heatmap.py```: allows to create a graphical representation of the evolution of the bins, in terms of heatmap.
