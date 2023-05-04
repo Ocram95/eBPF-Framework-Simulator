@@ -1,4 +1,4 @@
-# bccstego Simulator Suite
+# eBPF Framework Simulator Suite
 
 This suite contains several Python scripts that allows to simulate the program [eBPF Framework](https://github.com/Ocram95/eBPF-Framework) and calculate different metrics that allow to reveal the presence of network covert channels. In particular:
 - ```bcc_sim.py```: allows to simulate [eBPF Framework](https://github.com/Ocram95/eBPF-Framework);
