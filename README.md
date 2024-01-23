@@ -8,7 +8,7 @@ This suite contains several Python scripts that allows to simulate the program [
 
 
 # Dependencies
-Two libraries are necessary to work with pcapSteg.
+Two libraries are necessary.
 - Scapy:
 ```pip3 install scapy```
 - Pandas:
